@@ -1,0 +1,7 @@
+---
+- hosts: SchoolOfAM
+  tasks:
+    - name: Install Tomcat
+      become: yes
+      become_method: sudo
+      apt: name='tomcat8'

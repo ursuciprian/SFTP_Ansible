@@ -1,0 +1,7 @@
+---
+# tasks file for UserManagement
+
+- include_tasks: InstallServices.yml
+- include_tasks: CreateUser.yml
+- include_tasks: ftpUserConfiguration.yml
+- include_tasks: ConfigureUFWPorts.yml

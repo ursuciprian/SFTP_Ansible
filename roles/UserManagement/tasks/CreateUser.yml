@@ -1,0 +1,16 @@
+---
+
+ - name: "Create User"
+   user:
+     name: "{{ user_name }}"
+     password: "{{ user_password | password_hash('sha512') }}"
+     create_home: yes
+     generate_ssh_key: "{{ user_generate_ssh_key }}"
+     shell: "{{ user_shell }}"
+
+ - name: "Set authorized_key to allow SSH key based logins"
+   authorized_key:
+     user: "{{ user_name }}"
+     key: "{{ lookup('file', user_local_ssh_key_path) }}"
+   when: user_local_ssh_key_path | default(False)
+

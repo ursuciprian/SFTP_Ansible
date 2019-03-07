@@ -1,0 +1,8 @@
+---
+
+ - name: "Service installation..."
+   apt: 
+     name: "{{install_service}}"
+     state: latest
+     update-cache: yes
+   notify: restart

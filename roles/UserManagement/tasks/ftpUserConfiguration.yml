@@ -1,0 +1,78 @@
+---
+# User configuration for FTP
+ - name: "Create SFTP group"
+   group:
+     name: "{{ user_name }}"
+
+ - name: "Create SFTP folder...."
+   file:
+     path: '{{ sftp_folder }}'
+     state: directory
+     recurse: yes
+
+
+ - name: "Creating << Uploads >> folder and adding permission for the specified user"
+   file:
+     path: '{{ sftp_upload_folder }}'
+     state: directory
+     recurse: yes
+
+ - name: "Set the owner of the {{ sftp_folder }}"
+   become: yes
+   command: "chown {{ power_user }}:{{ power_user }} {{ sftp_folder }}"
+   register: "chown {{ power_user }}:{{ power_user }} {{ sftp_folder }}"
+
+ - name: "Set the owner of the {{ sftp_upload_folder }}"
+   become: yes
+   command: "chown {{ user_name }}:{{ user_name }} {{ sftp_upload_folder }}"
+   register: folderPermission
+
+ - name: "Setting the permission on {{ sftp_upload_folder }}"
+   become: yes
+   command: "chmod 755 -R {{ sftp_folder }}/{{ user_name }}"
+   register: chmod755
+
+ - stat:
+     path: '{{ sftp_folder}}'
+   register: sftpdir
+ - debug:
+      msg: "The path exists and it's a directory"
+   when: sftpdir.stat.isdir is defined and sftpdir.stat.isdir
+
+ - stat:
+     path: '{{ sftp_upload_folder }}'
+   register: upload
+ - debug:
+      msg: "The path exists and it's a directory"
+   when: upload.stat.isdir is defined and upload.stat.isdir
+
+ - name: "Backup the sshd config file"
+   copy:
+     src: "{{ sshd_config_file }}"
+     dest: "{{ backup_folder }}"
+
+
+ - name: "Modifying the sshd file"
+   blockinfile:
+     path: "{{ sshd_config_file }}"
+     block: |
+      Match User {{ user_name }}
+      ForceCommand internal-sftp
+      PasswordAuthentication no
+      ChrootDirectory {{ sftp_folder }}
+      PermitTunnel no
+      AllowAgentForwarding no
+      AllowTcpForwarding no
+      X11Forwarding no 
+   notify: sshdrestart
+
+ - name: "Create a backup of vsftpd config file"
+   copy:
+     src: "{{ vsftpd_config }}"
+     dest: "{{ backup_folder }}"
+  
+ - name: "Editing vsftpd config file..."
+   copy:
+     src: "{{ vsftpd_edit }}"
+     dest: "{{ sftp_config_base }}"
+   notify: restart

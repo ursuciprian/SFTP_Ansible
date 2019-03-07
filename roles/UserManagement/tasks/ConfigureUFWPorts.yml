@@ -1,0 +1,7 @@
+---
+ - name: "Configuring the firewall (ufw)..."
+   become: yes
+   command: "ufw allow from any to any port 20,21,10000:10100 proto tcp"
+   register: ufwconfig
+
+   notify: ufw restart

@@ -1,0 +1,19 @@
+---
+# handlers file for UserManagement
+ - name: "restart service"
+   service:
+     name: "{{ install_service }}"
+     state: restarted
+   listen: restart
+
+ - name: "restart sshd"
+   service:
+     name: "sshd"
+     state: restarted
+   listen: sshdrestart
+  
+ - name: "restart ufw"
+   service:
+     name: "ufw"
+     state: restarted
+   listen: "ufw restart"

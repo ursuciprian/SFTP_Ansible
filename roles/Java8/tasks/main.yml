@@ -1,0 +1,4 @@
+---
+# tasks file for /root/roles/Java8
+- import_tasks: installJava.yml
+- import_tasks: installPython.yml
